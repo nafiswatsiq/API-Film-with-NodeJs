@@ -90,6 +90,28 @@ app.get('/api/list-film/:slug', (req, res) => {
     })
 })
 
+//search
+app.get('/api/search-film/:search', (req, res) => {
+    const getFilm = req.params.search;
+    const getQuery = getFilm.split(' ');
+    //for looping getQuery
+    let getQuery_ = [];
+    for(let i = 0; i < getQuery.length; i++){
+        getQuery_.push(`title LIKE '%${getQuery[i]}%'`);
+    }
+
+    const sqlQuery = `SELECT * FROM film WHERE ${getQuery_.join(' OR ')}`;
+
+    db.query(sqlQuery, getQuery_, (err, result) =>{
+        if(err){
+            console.log(err);
+        } else{
+            res.send(result)
+            console.log(result)
+        }
+    })
+})
+
 //create
 app.post('/api/add-film', (req, res) =>{
     // Slugify config options
@@ -119,20 +141,20 @@ app.post('/api/add-film', (req, res) =>{
         } else{
             res.send(result)
             console.log(result)
+
+            for(let i = 0; i < tags.length; i++){
+                const sqlQueryTags = "INSERT INTO `tags`(`id_film`, `tags`) VALUES (?, ?)";
+                db.query(sqlQueryTags, [id_film, tags[i].tags], (err, result) => {
+                    if(err){
+                        console.log(err);
+                    } else{
+                        // res.send(result)
+                        console.log(result)
+                    }
+                })
+            }
         }
     })
-
-    for(let i = 0; i < tags.length; i++){
-        const sqlQueryTags = "INSERT INTO `tags`(`id_film`, `tags`) VALUES (?, ?)";
-        db.query(sqlQueryTags, [id_film, tags[i].tags], (err, result) => {
-            if(err){
-                console.log(err);
-            } else{
-                // res.send(result)
-                console.log(result)
-            }
-        })
-    }
 })
 
 //update
@@ -188,16 +210,25 @@ app.put('/api/update-film/:id_film', (req, res) => {
 })
 
 // Delete
-app.delete('/api/delete-film/:id', (req, res) => {
-    const id = req.params.id;
+app.delete('/api/delete-film/:id_film', (req, res) => {
+    const id_film = req.params.id_film;
 
-    const sqlQuery = "DELETE FROM `film` WHERE id = ?"
-    db.query(sqlQuery, id, (err, result) => {
+    const sqlQuery = "DELETE FROM `film` WHERE id_film = ?"
+    db.query(sqlQuery, id_film, (err, result) => {
         if(err){
             console.log(err);
         } else{
             res.send(result)
             console.log(result)
+
+            const sqlQueryTags = "DELETE FROM `tags` WHERE id_film = ?";
+            db.query(sqlQueryTags, id_film, (err, result) => {
+                if(err){
+                    console.log(err);
+                } else{
+                    console.log(result)
+                }
+            })
         }
     })
 })
