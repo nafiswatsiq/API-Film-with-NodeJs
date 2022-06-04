@@ -12,7 +12,16 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 //read
 app.get('/api/list-film', (req, res) => {
-    const sqlQuery = "SELECT * FROM film";
+    const getSort = req.query.sort;
+
+    let sqlQuery = '';
+    if(getSort == 'asc'){
+        sqlQuery = "SELECT * FROM film ORDER BY id ASC";
+    }else if(getSort == 'desc'){
+        sqlQuery = "SELECT * FROM film ORDER BY id DESC";
+    }else{
+        sqlQuery = "SELECT * FROM film";
+    }
     
     db.query(sqlQuery, (err, result) =>{
         if(err){
