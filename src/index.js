@@ -93,6 +93,8 @@ app.get('/api/list-film/:slug', (req, res) => {
 //search
 app.get('/api/search-film/:search', (req, res) => {
     const getFilm = req.params.search;
+    const getSort = req.query.sort;
+
     const getQuery = getFilm.split(' ');
     //for looping getQuery
     let getQuery_ = [];
@@ -100,7 +102,14 @@ app.get('/api/search-film/:search', (req, res) => {
         getQuery_.push(`title LIKE '%${getQuery[i]}%'`);
     }
 
-    const sqlQuery = `SELECT * FROM film WHERE ${getQuery_.join(' OR ')}`;
+    let sqlQuery = '';
+    if(getSort == 'asc'){
+       sqlQuery = `SELECT * FROM film WHERE ${getQuery_.join(' OR ')} ORDER BY id ASC`;
+    } else if(getSort == 'desc'){
+        sqlQuery = `SELECT * FROM film WHERE ${getQuery_.join(' OR ')} ORDER BY id DESC`;
+    } else{
+        sqlQuery = `SELECT * FROM film WHERE ${getQuery_.join(' OR ')}`;
+    }
 
     db.query(sqlQuery, getQuery_, (err, result) =>{
         if(err){
