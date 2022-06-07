@@ -21,6 +21,9 @@ module.exports = {
       description: {
         type: Sequelize.TEXT
       },
+      duration: {
+        type: Sequelize.STRING(225)
+      },
       thumbnail: {
         type: Sequelize.TEXT
       },
