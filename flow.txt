@@ -1,0 +1,4 @@
+run: npm run start
+migrate table: npx sequelize db:migrate
+undo migrate: npx sequelize db:migrate:undo
+undo migrate all: npx sequelize db:migrate:undo:all

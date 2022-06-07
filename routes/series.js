@@ -3,7 +3,7 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const slugify = require('slugify');
 const app = express();
-const { db } = require('../model/conection');
+const { db } = require('../config/conection');
 const randomstring = require("randomstring");
 
 app.use(cors());
