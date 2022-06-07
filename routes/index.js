@@ -11,7 +11,7 @@ app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 //read
-app.get('/api/list-film', (req, res) => {
+app.get('/api/list-movie', (req, res) => {
     const getSort = req.query.sort;
 
     let sqlQuery = '';
@@ -28,16 +28,15 @@ app.get('/api/list-film', (req, res) => {
             console.log(err);
         } else{
             res.send(result)
-            console.log(result)
         }
     })
 });
 
-app.get('/api/list-film/:slug', (req, res) => {
-    const getFilm = req.params.slug;
+app.get('/api/list-movie/:slug', (req, res) => {
+    const getSlug = req.params.slug;
 
     const sqlQuery = "SELECT * FROM `film` WHERE slug = ?";
-    db.query(sqlQuery, getFilm, (err, result) =>{
+    db.query(sqlQuery, getSlug, (err, result) =>{
         if(err){
             console.log(err);
         } else{
@@ -67,11 +66,11 @@ app.get('/api/list-film/:slug', (req, res) => {
 })
 
 //search
-app.get('/api/search-film/:search', (req, res) => {
-    const getFilm = req.params.search;
+app.get('/api/search-movie/:search', (req, res) => {
+    const getKeyword = req.params.search;
     const getSort = req.query.sort;
 
-    const getQuery = getFilm.split(' ');
+    const getQuery = getKeyword.split(' ');
     //for looping getQuery
     let getQuery_ = [];
     for(let i = 0; i < getQuery.length; i++){
@@ -92,13 +91,12 @@ app.get('/api/search-film/:search', (req, res) => {
             console.log(err);
         } else{
             res.send(result)
-            console.log(result)
         }
     })
 })
 
 //create
-app.post('/api/add-film', (req, res) =>{
+app.post('/api/add-movie', (req, res) =>{
     // Slugify config options
     const options = {
         replacement: '-',
@@ -108,33 +106,35 @@ app.post('/api/add-film', (req, res) =>{
         locale: 'en',
         trim: true,
     }
-    const id_film = randomstring.generate(25);
+    const id_movie = randomstring.generate(25);
     const slug = slugify(req.body.title, options)
     const title = req.body.title,
         description = req.body.description,
         thumbnail = req.body.thumbnail,
-        link_film = req.body.link_film,
+        link_movie = req.body.link_movie,
         rating = req.body.rating,
         type = req.body.type,
         tags = req.body.tags;
 
     const sqlQuery = "INSERT INTO `film`(`id_film`, `title`, `slug`, `description`, `thumbnail`, `link_film`, `rating`, `type`) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
     
-    db.query(sqlQuery, [id_film ,title, slug, description,thumbnail,link_film,rating,type], (err, result) => {
+    db.query(sqlQuery, [id_movie ,title, slug, description,thumbnail,link_movie,rating,type], (err, result) => {
         if(err){
             console.log(err);
         } else{
-            res.send(result)
-            console.log(result)
-
+            // res.send(result)
             for(let i = 0; i < tags.length; i++){
                 const sqlQueryTags = "INSERT INTO `tags`(`id_film`, `tags`) VALUES (?, ?)";
-                db.query(sqlQueryTags, [id_film, tags[i].tags], (err, result) => {
+                db.query(sqlQueryTags, [id_movie, tags[i].tags], (err, resultTags) => {
                     if(err){
                         console.log(err);
                     } else{
-                        // res.send(result)
-                        console.log(result)
+                        // console.log(result)
+                        res.json({
+                            status: 200,
+                            message: 'success create movie',
+                            data: result
+                        })
                     }
                 })
             }
@@ -143,8 +143,8 @@ app.post('/api/add-film', (req, res) =>{
 })
 
 //update
-app.put('/api/update-film/:id_film', (req, res) => {
-    const id_film = req.params.id_film;
+app.put('/api/update-movie/:id_movie', (req, res) => {
+    const id_movie = req.params.id_movie;
     // const id = req.body.id;
     const options = {
         replacement: '-',
@@ -158,28 +158,32 @@ app.put('/api/update-film/:id_film', (req, res) => {
     const title = req.body.title,
         description = req.body.description,
         thumbnail = req.body.thumbnail,
-        link_film = req.body.link_film,
+        link_movie = req.body.link_movie,
         rating = req.body.rating,
         type = req.body.type,
         tags = req.body.tags;
     
     const sqlQuery = "UPDATE `film` SET `title`= ?,`slug`= ?,`description`= ?,`thumbnail`= ?,`link_film`= ?,`rating`= ?,`type`= ? WHERE id_film =?"
 
-    db.query(sqlQuery, [title, slug, description, thumbnail, link_film, rating, type, id_film], (err, result) => {
+    db.query(sqlQuery, [title, slug, description, thumbnail, link_movie, rating, type, id_movie], (err, result) => {
         if(err){
             console.log(err);
         } else{
-            res.send(result)
-
+            // res.send(result)
+            res.json({
+                status: 200,
+                message: 'success update movie',
+                data: result
+            })
             const sqlQueryTags = "DELETE FROM `tags` WHERE id_film = ?";
-            db.query(sqlQueryTags, id_film, (err, result) => {
+            db.query(sqlQueryTags, id_movie, (err, result) => {
                 if(err){
                     console.log(err);
                 } else{
                     // console.log(result)
                     for(let i = 0; i < tags.length; i++){
                         const sqlQueryTags = "INSERT INTO `tags`(`id_film`, `tags`) VALUES (?, ?)";
-                        db.query(sqlQueryTags, [id_film, tags[i].tags], (err, result) => {
+                        db.query(sqlQueryTags, [id_movie, tags[i].tags], (err, resultTags) => {
                             if(err){
                                 console.log(err);
                             } else{
@@ -195,19 +199,22 @@ app.put('/api/update-film/:id_film', (req, res) => {
 })
 
 // Delete
-app.delete('/api/delete-film/:id_film', (req, res) => {
-    const id_film = req.params.id_film;
+app.delete('/api/delete-movie/:id_movie', (req, res) => {
+    const id_movie = req.params.id_movie;
 
     const sqlQuery = "DELETE FROM `film` WHERE id_film = ?"
-    db.query(sqlQuery, id_film, (err, result) => {
+    db.query(sqlQuery, id_movie, (err, result) => {
         if(err){
             console.log(err);
         } else{
-            res.send(result)
-            console.log(result)
+            res.json({
+                status: 200,
+                message: 'success delete movie',
+                data: result
+            })
 
             const sqlQueryTags = "DELETE FROM `tags` WHERE id_film = ?";
-            db.query(sqlQueryTags, id_film, (err, result) => {
+            db.query(sqlQueryTags, id_movie, (err, result) => {
                 if(err){
                     console.log(err);
                 } else{
