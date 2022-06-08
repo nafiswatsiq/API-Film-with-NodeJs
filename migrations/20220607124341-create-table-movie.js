@@ -22,7 +22,11 @@ module.exports = {
         type: Sequelize.TEXT
       },
       duration: {
-        type: Sequelize.STRING(225)
+        type: Sequelize.INTEGER
+      },
+      viewers: {
+        type: Sequelize.BIGINT,
+        defaultValue: 0
       },
       thumbnail: {
         type: Sequelize.TEXT

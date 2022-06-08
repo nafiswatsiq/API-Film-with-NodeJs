@@ -1,15 +1,22 @@
-const express = require('express');
-const bodyParser = require('body-parser');
-const cors = require('cors');
+// const express = require('express');
+// const bodyParser = require('body-parser');
+// const cors = require('cors');
 const slugify = require('slugify');
-const app = express();
+// const app = express();
 const { db } = require('../config/conection');
 const randomstring = require("randomstring");
 
-app.use(cors());
-app.use(express.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+// app.use(cors());
+// app.use(express.json());
+// app.use(bodyParser.urlencoded({ extended: true }));
 
+// date time
+const today = new Date();
+const date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+const time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+const dateTime = date+' '+time;
+
+// get all movie
 function getAllMovie(req, res){
     const getSort = req.query.sort;
 
@@ -31,13 +38,18 @@ function getAllMovie(req, res){
     })
 }
 
+// get by slug
 function getMovieBySlug(req, res){
     const getSlug = req.params.slug;
 
     const sqlQuery = "SELECT * FROM `movie` WHERE slug = ?";
     db.query(sqlQuery, getSlug, (err, result) =>{
-        if(err){
-            console.log(err);
+        if(result.length <= 0){
+            res.status(404).json({
+                status: 404,
+                message: 'Movie not found',
+                data: err
+            })
         } else{
             // res.send(result)
             const sqlQueryTags = "SELECT tags.id,tags.id_movie,tags.tags FROM movie JOIN tags ON movie.id_movie = tags.id_movie WHERE movie.id_movie = ?;";
@@ -56,7 +68,7 @@ function getMovieBySlug(req, res){
                         rating: result[i].rating,
                         type: result[i].type,
                         tgl_upload: result[i].tgl_upload,
-                        tags: resultTags
+                        tags: resultTags,
                     })
                 };
                 return res.status(200).json(result_)
@@ -65,6 +77,7 @@ function getMovieBySlug(req, res){
     })
 }
 
+// get by keyword
 function getMovieByKeyword(req, res){
     const getKeyword = req.params.keyword;
     const getSort = req.query.sort;
@@ -86,14 +99,19 @@ function getMovieByKeyword(req, res){
     }
 
     db.query(sqlQuery, getQuery_, (err, result) =>{
-        if(err){
-            console.log(err);
+        if(result.length <= 0){
+            res.status(404).json({
+                status: 404,
+                message: 'Movie not found',
+                data: err
+            })
         } else{
             res.send(result)
         }
     })
 }
 
+// create movie
 function createMovie(req, res){
     // Slugify config options
     const options = {
@@ -141,6 +159,22 @@ function createMovie(req, res){
     })
 }
 
+// update viewer
+function updateViewers(req, res){
+    const id_movie = req.params.id_movie;
+    const viewers = req.body.viewers;
+
+    const sqlQuery = "UPDATE `movie` SET `viewers`=? WHERE `id_movie`=?";
+    db.query(sqlQuery, [viewers, id_movie], (err, result) =>{
+        if(err){
+            console.log(err);
+        } else{
+            res.send(result)
+        }
+    })
+}
+
+// update movie
 function updateMovie(req, res){
     const id_movie = req.params.id_movie;
     // const id = req.body.id;
@@ -162,9 +196,9 @@ function updateMovie(req, res){
         type = req.body.type,
         tags = req.body.tags;
     
-    const sqlQuery = "UPDATE `movie` SET `title`= ?,`slug`= ?,`description`= ?,`duration`= ?,`thumbnail`= ?,`link_movie`= ?,`rating`= ?,`type`= ? WHERE id_movie =?"
+    const sqlQuery = "UPDATE `movie` SET `title`= ?,`slug`= ?,`description`= ?,`duration`= ?,`thumbnail`= ?,`link_movie`= ?,`rating`= ?,`type`= ?, `updateAt`= ? WHERE id_movie =?"
 
-    db.query(sqlQuery, [title, slug, description, duration, thumbnail, link_movie, rating, type, id_movie], (err, result) => {
+    db.query(sqlQuery, [title, slug, description, duration, thumbnail, link_movie, rating, type, dateTime, id_movie], (err, result) => {
         if(err){
             console.log(err);
         } else{
@@ -197,6 +231,7 @@ function updateMovie(req, res){
     })
 }
 
+// delete movie
 function deleteMovie(req, res){
     const id_movie = req.params.id_movie;
 
@@ -229,5 +264,6 @@ module.exports = {
     getMovieByKeyword,
     createMovie,
     updateMovie,
-    deleteMovie
+    deleteMovie,
+    updateViewers
 }

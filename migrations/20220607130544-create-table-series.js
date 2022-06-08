@@ -21,6 +21,10 @@ module.exports = {
       link_series: {
         type: Sequelize.TEXT
       },
+      viewers: {
+        type: Sequelize.BIGINT,
+        defaultValue: 0
+      },
       createAt: {
         type: Sequelize.DATE,
         allowNull: false,
