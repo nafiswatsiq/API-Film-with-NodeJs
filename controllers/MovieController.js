@@ -135,7 +135,7 @@ function createMovie(req, res){
 
     const sqlQuery = "INSERT INTO `movie`(`id_movie`, `title`, `slug`, `description`, `duration`, `thumbnail`, `link_movie`, `rating`, `type`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
     
-    db.query(sqlQuery, [id_movie ,title, slug, description, duration, thumbnail, link_movie, rating, type], (err, result) => {
+    let addMovie = db.query(sqlQuery, [id_movie ,title, slug, description, duration, thumbnail, link_movie, rating, type], (err, result) => {
         if(err){
             console.log(err);
         } else{
@@ -146,16 +146,17 @@ function createMovie(req, res){
                     if(err){
                         console.log(err);
                     } else{
-                        // console.log(result)
-                        res.json({
-                            status: 200,
-                            message: 'success create movie',
-                            data: result
-                        })
+                        console.log(resultTags)
                     }
                 })
             }
         }
+    })
+
+    res.json({
+        status: 200,
+        message: 'success create movie',
+        data: addMovie.values
     })
 }
 
