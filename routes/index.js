@@ -9,6 +9,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 const movieController = require('../controllers/MovieController');
 const seriesController = require('../controllers/SeriesController');
+const sendEmail = require('../controllers/SendEmail');
 
 // Get All Movie
 app.get('/api/list-movie', movieController.getAllMovie);
@@ -35,6 +36,9 @@ app.get('/api/list-series/:id_movie', seriesController.getSeriesByMovie);
 app.get('/api/episde-series/:id_series', seriesController.getSeriesByEpisode);
 // delete series
 app.delete('/api/delete-series/:id_series', seriesController.deleteSeries);
+
+// post send email
+app.post('/api/verify-account', sendEmail.verifyEmail);
 
 
 app.listen(3001, () => {
