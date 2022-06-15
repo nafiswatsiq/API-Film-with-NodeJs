@@ -1,4 +1,54 @@
 
+# RESTAPI MOVIE
+
+rest api movie using nodeJs and expressjs
+
+
+## Appendix
+
+here I use nodeJs and mysql database, so hopefully you have installed node.js and phpmyadmin
+## Run Locally
+
+Clone the project
+
+```bash
+  git clone https://github.com/nafiswatsiq/API-Film-with-NodeJs.git
+```
+
+Go to the project directory
+
+```bash
+  cd API-Film-with-NodeJs
+```
+## Environment Variables
+
+To run this project, you will need to add the following environment variables to your .env file
+
+`DB_USERNAME` = your username database
+
+`DB_PASSWORD` = your password
+
+`DB_HOST` = localhost
+
+`DB_NAME` = your database name
+
+`DB_DIALECT` = mysql
+
+## when it's finished, just migrate the database
+
+Migrations table database
+
+```bash
+  npx sequelize db:migrate
+```
+
+Start the server
+
+```bash
+  npm run start
+```
+
+
 ## API Reference
 
 ### **_Run in port 3001_**
