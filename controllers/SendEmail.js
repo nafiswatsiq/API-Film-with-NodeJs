@@ -1,4 +1,6 @@
 const nodemailer = require('nodemailer');
+require('dotenv').config()
+const {MAIL_MAILER, MAIL_HOST, MAIL_PORT, MAIL_USERNAME, MAIL_PASSWORD, MAIL_ENCRYPTION, MAIL_FROM_ADDRESS} = process.env;
 
 function verifyEmail(req, res) {
     const email = req.body.email;
@@ -19,18 +21,18 @@ function verifyEmail(req, res) {
         </html>`
         
     const transporter = nodemailer.createTransport({
-        host: 'smtp.mailtrap.io',
-        port: 2525,
+        host: MAIL_HOST,
+        port: MAIL_PORT,
         secure:false,
-        requireTLS:true,
+        requireTLS: MAIL_ENCRYPTION,
         auth: {
-          user: '00e3a08dd4e52a', // enter your email address
-          pass: '1ccb9ae5a6c64d'  // enter your visible/encripted password
+          user: MAIL_USERNAME, // enter your email address
+          pass: MAIL_PASSWORD  // enter your visible/encripted password
         }
     });
 
     const mailOptions = {
-        from: 'nwcorp@gmail.com',
+        from: MAIL_FROM_ADDRESS,
         to: email,
         subject: 'verifikasi',
         html: bodyEmail
